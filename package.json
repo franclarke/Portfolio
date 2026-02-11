@@ -1,0 +1,35 @@
+{
+  "name": "portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "render:hero": "remotion render src/remotion/index.ts HeroLoop public/videos/hero-loop.mp4",
+    "render:walkthrough": "remotion render src/remotion/index.ts SiteWalkthrough public/videos/site-walkthrough.mp4",
+    "render:tactical": "remotion render src/remotion/index.ts TacticalMicro public/videos/tactical-micro.mp4",
+    "render:decision": "remotion render src/remotion/index.ts DecisionMicro public/videos/decision-micro.mp4",
+    "render:scout": "remotion render src/remotion/index.ts ScoutMicro public/videos/scout-micro.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.421",
+    "@remotion/player": "^4.0.421",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "^4.0.421"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
