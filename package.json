@@ -14,12 +14,15 @@
     "render:scout": "remotion render src/remotion/index.ts ScoutMicro public/videos/scout-micro.mp4"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
     "@remotion/cli": "^4.0.421",
     "@remotion/player": "^4.0.421",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "remotion": "^4.0.421"
+    "remotion": "^4.0.421",
+    "three": "^0.182.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
