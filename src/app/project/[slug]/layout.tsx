@@ -1,26 +1,25 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    robots: "index, follow",
+  robots: "index, follow",
 };
 
 export default function ProjectLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-    return (
-        <div className="case-study-layout">
-            {children}
+  return (
+    <div className="case-study-layout">
+      {children}
 
-            <style>{`
+      <style>{`
         .case-study-layout {
-          max-width: 900px;
+          max-width: 920px;
           margin: 0 auto;
           padding: var(--space-5xl) var(--space-lg) var(--space-3xl);
         }
 
-        /* ── Hero ── */
         .cs-hero {
           display: flex;
           flex-direction: column;
@@ -70,7 +69,6 @@ export default function ProjectLayout({
           color: var(--text-secondary);
         }
 
-        /* ── Section Pattern ── */
         .cs-section {
           display: grid;
           grid-template-columns: 140px 1fr;
@@ -102,7 +100,6 @@ export default function ProjectLayout({
           line-height: 1.75;
         }
 
-        /* ── Architecture Pipeline ── */
         .cs-pipeline {
           display: flex;
           flex-direction: column;
@@ -139,7 +136,6 @@ export default function ProjectLayout({
           background: var(--border-hover);
         }
 
-        /* ── Results ── */
         .cs-results {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -171,7 +167,6 @@ export default function ProjectLayout({
           line-height: 1.4;
         }
 
-        /* ── Model Card ── */
         .cs-model-card {
           background: var(--bg-surface);
           border: 1px solid var(--border);
@@ -213,13 +208,12 @@ export default function ProjectLayout({
           position: relative;
         }
         .cs-mc-failures li::before {
-          content: "⚠";
+          content: "!";
           position: absolute;
           left: 0;
           font-size: 0.625rem;
         }
 
-        /* ── Lessons ── */
         .cs-lessons {
           display: flex;
           flex-direction: column;
@@ -241,7 +235,6 @@ export default function ProjectLayout({
           line-height: 1.7;
         }
 
-        /* ── Footer ── */
         .cs-footer {
           padding: var(--space-3xl) 0;
           text-align: center;
@@ -261,7 +254,6 @@ export default function ProjectLayout({
           border-color: var(--accent);
         }
 
-        /* ── Responsive ── */
         @media (max-width: 640px) {
           .cs-section {
             grid-template-columns: 1fr;
@@ -278,6 +270,6 @@ export default function ProjectLayout({
           }
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 }

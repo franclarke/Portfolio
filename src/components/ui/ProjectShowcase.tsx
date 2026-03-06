@@ -1,49 +1,43 @@
 "use client";
 
-import { ReactNode } from "react";
 import { useViewMode } from "@/lib/viewMode";
-import { projects, Project } from "@/content/data/projects";
+import type { Project } from "@/content/data/projects";
 import ModelCard from "@/components/ui/ModelCard";
+import type { ReactNode } from "react";
 
 interface ProjectShowcaseProps {
-  slug: string;
-  /** Index (0, 1, 2) controls alternating layout */
+  project: Project;
   index: number;
-  children: ReactNode; // The pitch artefact
+  artifact: ReactNode;
 }
 
 export default function ProjectShowcase({
-  slug,
+  project,
   index,
-  children,
+  artifact,
 }: ProjectShowcaseProps) {
   const { isBuilder } = useViewMode();
-  const project = projects.find((p) => p.slug === slug) as Project;
-  if (!project) return null;
-
   const reversed = index % 2 === 1;
 
   return (
     <article
       className={`showcase ${reversed ? "showcase--reversed" : ""}`}
-      id={`project-${slug}`}
+      id={`project-${project.slug}`}
     >
-      {/* Info side */}
       <div className="showcase-info">
         <div className="showcase-meta">
           <span className="showcase-index text-mono">
             {String(index + 1).padStart(2, "0")}
           </span>
           <span className="showcase-status text-caption">{project.status}</span>
+          <span className="showcase-track text-caption">{project.track.replace("-", " ")}</span>
         </div>
 
         <h3 className="showcase-title text-heading">{project.title}</h3>
         <p className="showcase-tagline text-subhead">{project.tagline}</p>
 
         <p className="showcase-desc text-body">
-          {isBuilder
-            ? project.description.builder
-            : project.description.explain}
+          {isBuilder ? project.description.builder : project.description.explain}
         </p>
 
         <div className="showcase-tags">
@@ -57,13 +51,12 @@ export default function ProjectShowcase({
         <div className="showcase-actions">
           <ModelCard project={project} />
           <a href={`/project/${project.slug}`} className="cs-link text-mono">
-            View case study →
+            View case study {"->"}
           </a>
         </div>
       </div>
 
-      {/* Artefact side */}
-      <div className="showcase-artefact">{children}</div>
+      <div className="showcase-artefact">{artifact}</div>
 
       <style jsx>{`
         .showcase {
@@ -94,20 +87,26 @@ export default function ProjectShowcase({
           display: flex;
           align-items: center;
           gap: var(--space-sm);
+          flex-wrap: wrap;
         }
         .showcase-index {
           font-size: 0.6875rem;
           color: var(--text-muted);
           letter-spacing: 0.05em;
         }
-        .showcase-status {
+        .showcase-status,
+        .showcase-track {
           color: var(--accent);
           padding: 2px var(--space-xs);
-          border: 1px solid var(--accent);
-          border-radius: 3px;
-          font-size: 0.6rem;
+          border: 1px solid rgba(232, 255, 89, 0.45);
+          border-radius: 999px;
+          font-size: 0.58rem;
           text-transform: uppercase;
-          letter-spacing: 0.04em;
+          letter-spacing: 0.06em;
+        }
+        .showcase-track {
+          color: var(--accent-alt);
+          border-color: rgba(89, 184, 255, 0.4);
         }
         .showcase-title {
           font-size: clamp(1.75rem, 3vw, 2.25rem);
@@ -154,6 +153,7 @@ export default function ProjectShowcase({
         }
         .showcase-artefact {
           min-width: 0;
+          width: 100%;
         }
 
         @media (max-width: 900px) {

@@ -27,23 +27,24 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fran Clarke — AI/ML Engineer",
+  metadataBase: new URL("https://franclarke.dev"),
+  title: "Francisco Clarke - Applied AI/ML Engineer",
   description:
-    "AI/ML Engineer specializing in Computer Vision, ML Applied, and Football Analytics. Building intelligent systems that add signal where there's noise.",
+    "Applied AI/ML engineer focused on computer vision, generative systems, and production-grade reliability. Building signal from noisy data.",
   keywords: [
-    "AI Engineer",
+    "Applied AI Engineer",
     "ML Engineer",
     "Computer Vision",
-    "Football Analytics",
-    "YOLOv10",
-    "Machine Learning",
-    "Portfolio",
+    "Generative AI",
+    "FastAPI",
+    "LoRA",
+    "AI Portfolio",
   ],
-  authors: [{ name: "Fran Clarke" }],
+  authors: [{ name: "Francisco Clarke" }],
   openGraph: {
-    title: "Fran Clarke — AI/ML Engineer",
+    title: "Francisco Clarke - Applied AI/ML Engineer",
     description:
-      "Computer Vision, ML Applied, and Football Analytics. Building intelligent systems.",
+      "Computer vision, generative pipelines, and reliability-focused AI systems.",
     type: "website",
     locale: "en_US",
   },
@@ -60,9 +61,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body
-        className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}
-      >
+      <body className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
         <MotionTierProvider>
           <ViewModeProvider>
             <a href="#main-content" className="skip-link">

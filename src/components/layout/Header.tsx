@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useViewMode } from "@/lib/viewMode";
 
 export default function Header() {
@@ -14,10 +15,31 @@ export default function Header() {
 
         <nav className="header-nav" aria-label="Main navigation">
           <ul className="header-nav-list">
-            <li><a href="/#projects" className="header-link">Projects</a></li>
-            <li><a href="/#capabilities" className="header-link">Capabilities</a></li>
-            <li><a href="/#about" className="header-link">About</a></li>
-            <li><a href="/#contact" className="header-link">Contact</a></li>
+            <li>
+              <Link href="/#pareto" className="header-link">
+                Pareto
+              </Link>
+            </li>
+            <li>
+              <Link href="/#projects" className="header-link">
+                Projects
+              </Link>
+            </li>
+            <li>
+              <Link href="/#reliability" className="header-link">
+                Reliability
+              </Link>
+            </li>
+            <li>
+              <Link href="/#experience" className="header-link">
+                Experience
+              </Link>
+            </li>
+            <li>
+              <Link href="/#contact" className="header-link">
+                Contact
+              </Link>
+            </li>
           </ul>
         </nav>
 
@@ -44,7 +66,7 @@ export default function Header() {
           right: 0;
           z-index: 100;
           height: var(--header-height);
-          background: rgba(12, 13, 14, 0.85);
+          background: rgba(8, 10, 14, 0.82);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
           border-bottom: 1px solid var(--border);
@@ -69,15 +91,16 @@ export default function Header() {
         }
         .header-nav-list {
           display: flex;
-          gap: var(--space-xl);
+          gap: var(--space-lg);
           list-style: none;
         }
         .header-link {
           color: var(--text-secondary);
           text-decoration: none;
-          font-size: 0.875rem;
-          font-weight: 400;
-          letter-spacing: 0.02em;
+          font-size: 0.78rem;
+          font-weight: 500;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
           transition: color var(--duration-fast) var(--ease-out-quint);
         }
         .header-link:hover {
@@ -110,7 +133,7 @@ export default function Header() {
           color: var(--text-muted);
           font-size: 0.75rem;
         }
-        @media (max-width: 768px) {
+        @media (max-width: 960px) {
           .header-nav {
             display: none;
           }

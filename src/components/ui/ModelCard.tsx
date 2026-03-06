@@ -23,7 +23,7 @@ export default function ModelCard({ project }: ModelCardProps) {
                 aria-expanded={isOpen}
                 aria-label={`Model card for ${project.title}`}
             >
-                <span className="trigger-icon">⬡</span>
+                <span className="trigger-icon">[]</span>
                 <span className="trigger-label text-caption">Model Card</span>
             </button>
 
@@ -161,7 +161,7 @@ export default function ModelCard({ project }: ModelCardProps) {
           position: relative;
         }
         .mc-failure-list li::before {
-          content: "△";
+          content: "!";
           position: absolute;
           left: 0;
           color: var(--warning);

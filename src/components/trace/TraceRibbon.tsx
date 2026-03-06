@@ -41,11 +41,11 @@ export default function TraceRibbon() {
     // Checkpoint positions along the trace
     const checkpoints = [
         { y: 15, label: "init", active: progress > 0.02 },
-        { y: 28, label: "tactical-vision", active: progress > 0.2 },
-        { y: 48, label: "decision-intelligence", active: progress > 0.4 },
-        { y: 68, label: "scouting-engine", active: progress > 0.6 },
-        { y: 82, label: "capabilities", active: progress > 0.75 },
-        { y: 95, label: "deploy", active: progress > 0.9 },
+        { y: 27, label: "pareto", active: progress > 0.18 },
+        { y: 43, label: "projects", active: progress > 0.33 },
+        { y: 60, label: "reliability", active: progress > 0.52 },
+        { y: 78, label: "experience", active: progress > 0.72 },
+        { y: 93, label: "contact", active: progress > 0.88 },
     ];
 
     return (

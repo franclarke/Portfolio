@@ -1,179 +1,301 @@
+export type ProjectTrack = "applied-ai" | "football-lab";
+export type ProjectDomain = "vision" | "genai" | "ml-systems" | "data-pipeline";
+export type ArtifactMode = "video-demo" | "demo-only";
+
 export interface Project {
-    slug: string;
-    title: string;
-    tagline: string;
-    description: {
-        explain: string;
-        builder: string;
-    };
-    modelCard: {
-        task: string;
-        data: string;
-        model: string;
-        keyMetric: string;
-        latency: string;
-        failureModes: string[];
-    };
-    tags: string[];
-    status: "live" | "in-progress" | "research";
-    caseStudy: {
-        problem: string;
-        approach: string;
-        architecture: { step: string; detail: string }[];
-        results: { label: string; value: string; note?: string }[];
-        lessons: string[];
-    };
+  slug: string;
+  title: string;
+  tagline: string;
+  track: ProjectTrack;
+  domains: ProjectDomain[];
+  artifactMode: ArtifactMode;
+  description: {
+    explain: string;
+    builder: string;
+  };
+  modelCard: {
+    task: string;
+    data: string;
+    model: string;
+    keyMetric: string;
+    latency: string;
+    failureModes: string[];
+  };
+  tags: string[];
+  status: "live" | "in-progress" | "research";
+  caseStudy: {
+    problem: string;
+    approach: string;
+    architecture: { step: string; detail: string }[];
+    results: { label: string; value: string; note?: string }[];
+    lessons: string[];
+  };
 }
 
 export const projects: Project[] = [
-    {
-        slug: "tactical-vision",
-        title: "Tactical Vision",
-        tagline: "Detección Automática de Bloques y Presión",
-        description: {
-            explain:
-                "From broadcast video, this system detects all 22 players and the ball in real time, projects them onto a top-down tactical view, and measures whether a team's defensive block is compact or dangerously stretched.",
-            builder:
-                "YOLOv10 with CUDA optimization for player+ball detection on broadcast feeds. ByteTrack/DeepSORT for multi-object tracking. Homography estimation via DLT to project detections to a 2D pitch model. Convex hull of 10 outfield players computes block area; threshold-based alerts trigger when inter-line distance exceeds 15m.",
-        },
-        modelCard: {
-            task: "Object Detection + Tracking + Tactical Analysis",
-            data: "Broadcast video feeds (1080p, 25fps)",
-            model: "YOLOv10-M (CUDA) + ByteTrack",
-            keyMetric: "mAP@0.5: 0.89 | Tracking MOTA: 0.78",
-            latency: "~28ms/frame on GTX 1650",
-            failureModes: [
-                "Camera angle changes break homography",
-                "Occlusion in crowded areas",
-                "Goalkeeper detection near goal",
-            ],
-        },
-        tags: ["Computer Vision", "YOLOv10", "CUDA", "ByteTrack", "Tracking"],
-        status: "in-progress",
-        caseStudy: {
-            problem:
-                "Coaches need real-time feedback on defensive structure during matches. Current manual video analysis takes 2-3 hours per match and depends on subjective interpretation. There's no automated way to measure whether a team's defensive block is compact or dangerously stretched from broadcast footage.",
-            approach:
-                "Build an end-to-end pipeline that takes broadcast video as input and outputs real-time tactical metrics. Use object detection (YOLOv10) for player/ball localization, multi-object tracking (ByteTrack) for identity persistence across frames, and homography estimation (DLT) to project detections onto a standardized 2D pitch model. Compute defensive line positions and inter-line distances as quantitative compactness metrics.",
-            architecture: [
-                { step: "Ingest", detail: "Broadcast video at 1080p/25fps → frame extraction pipeline" },
-                { step: "Detect", detail: "YOLOv10-M with CUDA: 22 players + ball per frame, ~28ms/frame on GTX 1650" },
-                { step: "Track", detail: "ByteTrack for temporal consistency, handles occlusions and re-identification" },
-                { step: "Project", detail: "4-point homography via DLT maps pixel coords → pitch coordinates (105×68m)" },
-                { step: "Analyze", detail: "Compute defensive/midfield line Y positions, inter-line distance, convex hull area" },
-                { step: "Alert", detail: "Threshold-based alerts when distance > 15m ('DESEQUILIBRIO')" },
-            ],
-            results: [
-                { label: "mAP@0.5", value: "0.89", note: "Player+ball detection accuracy" },
-                { label: "MOTA", value: "0.78", note: "Multi-object tracking accuracy" },
-                { label: "Inference", value: "28ms/frame", note: "GTX 1650, real-time capable" },
-                { label: "Homography RMSE", value: "1.2m", note: "Projection accuracy on pitch" },
-            ],
-            lessons: [
-                "Camera angle changes during broadcasts break the homography matrix — need an adaptive re-estimation pipeline for production use.",
-                "Goalkeeper detection near the goal is the hardest case due to visual similarity with the net. Custom anchor ratios improved recall by 12%.",
-                "Optimizing for GTX 1650 forced architectural choices (YOLOv10-M over v10-L) that actually improved latency without meaningful accuracy loss.",
-            ],
-        },
+  {
+    slug: "tactical-vision",
+    title: "Tactical Vision",
+    tagline: "Computer vision for defensive shape intelligence",
+    track: "football-lab",
+    domains: ["vision", "ml-systems"],
+    artifactMode: "demo-only",
+    description: {
+      explain:
+        "From broadcast video, this system detects all players and the ball in real time, maps them to a normalized pitch, and measures whether a team block is compact or stretched.",
+      builder:
+        "YOLOv10 for player and ball detection, ByteTrack for identity persistence, homography via DLT for pitch projection, and threshold alerts when inter-line distance breaks tactical compactness rules.",
     },
-    {
-        slug: "decision-intelligence",
-        title: "Decision Intelligence",
-        tagline: "Motor de Pase Óptimo — Riesgo vs Recompensa",
-        description: {
-            explain:
-                "Given any passing situation, this engine evaluates every possible option and recommends the optimal pass — balancing completion probability against territorial gain. It reveals whether a player chose wisely or left value on the pitch.",
-            builder:
-                "StatsBomb event data enriched with freeze-frame player positions. Feature engineering: distance to nearest defender, pressure angle, expected threat (xT) gain, receiver body orientation. XGBoost/LightGBM ensemble predicts pass completion probability. Voronoi tessellation from player positions defines space ownership.",
-        },
-        modelCard: {
-            task: "Pass Outcome Prediction + Optimal Decision",
-            data: "StatsBomb open data (enriched with xT grid)",
-            model: "XGBoost/LightGBM ensemble",
-            keyMetric: "AUC-ROC: 0.83 | Brier Score: 0.18",
-            latency: "~2ms per decision evaluation",
-            failureModes: [
-                "Limited to event data granularity",
-                "No off-ball movement prediction",
-                "xT grid assumes static field state",
-            ],
-        },
-        tags: ["XGBoost", "LightGBM", "StatsBomb", "Feature Engineering", "xT"],
-        status: "in-progress",
-        caseStudy: {
-            problem:
-                "Football analysts evaluate passing decisions qualitatively. There's no systematic way to measure whether a player chose the best available pass or left value on the pitch. Existing xG models focus on shots — passing decisions remain unquantified.",
-            approach:
-                "Use StatsBomb open data (enriched with freeze-frame positions) to build a pass completion probability model and an expected threat (xT) grid. For any given passing situation, evaluate all possible receiver options, compute completion probability and xT gain for each, and identify the optimal pass. Visualize space ownership via Voronoi tessellation.",
-            architecture: [
-                { step: "Data", detail: "StatsBomb open data: events + freeze frames with 22-player positions" },
-                { step: "Features", detail: "25 features per pass: distance, angle, defender pressure, receiver orientation, xT grid lookup" },
-                { step: "Model", detail: "XGBoost/LightGBM ensemble for completion probability (AUC-ROC: 0.83)" },
-                { step: "xT Grid", detail: "12×8 pitch grid trained on 300K+ actions mapping position → goal probability" },
-                { step: "Evaluate", detail: "For each situation: score all possible passes, rank by expected value (prob × xT gain)" },
-                { step: "Visualize", detail: "Canvas2D Voronoi tessellation showing space ownership + optimal pass overlay" },
-            ],
-            results: [
-                { label: "AUC-ROC", value: "0.83", note: "Pass completion prediction" },
-                { label: "Brier Score", value: "0.18", note: "Calibration quality" },
-                { label: "Inference", value: "2ms/decision", note: "Real-time evaluation" },
-                { label: "xT Coverage", value: "300K+ actions", note: "Training data volume" },
-            ],
-            lessons: [
-                "Event data granularity is a ceiling — freeze frames only capture snapshots, not continuous movement. Tracking data would significantly improve the model.",
-                "The xT grid assumes a static field state, which creates artifacts near the penalty area where dynamics change rapidly.",
-                "Voronoi tessellation from player positions is computationally cheap and visually powerful for communicating space ownership to non-technical stakeholders.",
-            ],
-        },
+    modelCard: {
+      task: "Object Detection + Tracking + Tactical Metrics",
+      data: "Broadcast football video (1080p, 25fps)",
+      model: "YOLOv10-M (CUDA) + ByteTrack",
+      keyMetric: "mAP@0.5: 0.89 | MOTA: 0.78",
+      latency: "~28ms/frame on GTX 1650",
+      failureModes: [
+        "Camera angle changes can break homography",
+        "Dense midfield occlusion degrades tracking",
+        "Goalkeeper-net overlap causes false negatives",
+      ],
     },
-    {
-        slug: "scouting-engine",
-        title: "Scouting Engine",
-        tagline: "ETL de Talento Oculto",
-        description: {
-            explain:
-                "An automated system that scrapes football statistics weekly, normalizes player profiles, and finds hidden talent by computing similarity to reference players — like finding a cheap alternative to an expensive transfer target.",
-            builder:
-                "Selenium/Playwright scraping pipeline pulling data weekly from fbref and Transfermarkt. PostgreSQL normalized schema (players, seasons, metrics, market_values). KNN with cosine similarity on z-scored per-90 stats for player matching. Telegram bot API sends weekly 'talent alert' reports with radar charts.",
-        },
-        modelCard: {
-            task: "Player Similarity + Automated Scouting Reports",
-            data: "fbref + Transfermarkt (weekly scrape)",
-            model: "KNN (cosine similarity, k=10)",
-            keyMetric: "Cosine similarity threshold: 0.85",
-            latency: "ETL pipeline: ~12 min/week",
-            failureModes: [
-                "Scraping targets can change HTML structure",
-                "Age/league bias in similarity",
-                "No tactical context in per-90 stats",
-            ],
-        },
-        tags: ["ETL", "PostgreSQL", "Selenium", "KNN", "Telegram Bot"],
-        status: "in-progress",
-        caseStudy: {
-            problem:
-                "South American leagues have deep talent pools but limited data coverage in commercial scouting platforms. Manual scouting requires watching hundreds of hours of match footage per week. Clubs need an affordable way to systematically find players similar to expensive transfer targets.",
-            approach:
-                "Build a fully automated ETL pipeline that scrapes player statistics weekly, normalizes them into a structured database, and computes player similarity using KNN with cosine distance on z-scored per-90 metrics. Surface results via a Telegram bot that sends weekly 'talent alert' reports with radar charts to scouts.",
-            architecture: [
-                { step: "Scrape", detail: "Selenium/Playwright pipelines on fbref + Transfermarkt, scheduled weekly via cron" },
-                { step: "Normalize", detail: "PostgreSQL schema: players, seasons, metrics, market_values — all per-90 normalized" },
-                { step: "Index", detail: "Z-score standardization across position groups to enable fair comparison" },
-                { step: "Match", detail: "KNN (k=10) with cosine similarity on 28 per-90 statistical dimensions" },
-                { step: "Filter", detail: "Age, league, market value, and minimum minutes thresholds" },
-                { step: "Report", detail: "Telegram Bot API sends formatted reports with radar charts and similarity scores" },
-            ],
-            results: [
-                { label: "Similarity", value: "cos ≥ 0.85", note: "Quality threshold for alerts" },
-                { label: "Pipeline", value: "12 min/week", note: "Full ETL cycle time" },
-                { label: "Coverage", value: "4,200+ players", note: "Across 8 leagues" },
-                { label: "Dimensions", value: "28 metrics", note: "Per-90 statistical features" },
-            ],
-            lessons: [
-                "Scraping targets change HTML structure 2-3 times per year — the pipeline needs robust fallback selectors and change detection alerts.",
-                "Per-90 stats have inherent age and league bias. A 21-year-old in Liga Profesional isn't directly comparable to a 28-year-old in the Premier League without adjustments.",
-                "Telegram was the right distribution channel — scouts check their phones, not dashboards. The bot's adoption rate validated the 'push, don't pull' design decision.",
-            ],
-        },
+    tags: ["Computer Vision", "YOLOv10", "CUDA", "Tracking", "Homography"],
+    status: "in-progress",
+    caseStudy: {
+      problem:
+        "Coaches need objective feedback on defensive compactness during matches, but manual analysis is slow and subjective.",
+      approach:
+        "Build a real-time vision pipeline from broadcast footage to tactical metrics with a calibrated 2D pitch representation and alerting logic.",
+      architecture: [
+        { step: "Ingest", detail: "Decode 1080p stream and sample tactical frames" },
+        { step: "Detect", detail: "Run YOLOv10-M for players and ball localization" },
+        { step: "Track", detail: "Apply ByteTrack for temporal identity continuity" },
+        { step: "Project", detail: "Estimate homography and map to 105x68m coordinates" },
+        { step: "Analyze", detail: "Compute line distances, hull area, and compactness score" },
+        { step: "Alert", detail: "Trigger tactical warnings when distance > 15m" },
+      ],
+      results: [
+        { label: "mAP@0.5", value: "0.89", note: "Player and ball detection quality" },
+        { label: "MOTA", value: "0.78", note: "Tracking consistency" },
+        { label: "Latency", value: "28ms/frame", note: "Consumer GPU viable" },
+        { label: "Homography RMSE", value: "1.2m", note: "Projection precision" },
+      ],
+      lessons: [
+        "Adaptive homography recalibration is required for broadcast camera switches.",
+        "Consumer-GPU optimization drove model sizing decisions without major quality loss.",
+        "Tactical stakeholders trust metrics more when visual overlays explain them frame-by-frame.",
+      ],
     },
+  },
+  {
+    slug: "decision-intelligence",
+    title: "Decision Intelligence",
+    tagline: "Risk-reward pass recommendation engine",
+    track: "football-lab",
+    domains: ["ml-systems", "data-pipeline"],
+    artifactMode: "demo-only",
+    description: {
+      explain:
+        "Given a passing context, this engine scores all options and recommends the best expected value decision by balancing completion probability and expected threat gain.",
+      builder:
+        "StatsBomb freeze-frame features, xT lookup grid, defender pressure geometry, and a calibrated XGBoost/LightGBM ensemble produce ranked pass recommendations in milliseconds.",
+    },
+    modelCard: {
+      task: "Pass Outcome Prediction + Decision Ranking",
+      data: "StatsBomb open events + freeze frames",
+      model: "XGBoost + LightGBM ensemble",
+      keyMetric: "AUC-ROC: 0.83 | Brier: 0.18",
+      latency: "~2ms per evaluated decision",
+      failureModes: [
+        "Event-data granularity limits temporal context",
+        "No off-ball movement forecasting",
+        "xT grid is static under dynamic pressure states",
+      ],
+    },
+    tags: ["XGBoost", "LightGBM", "xT", "Feature Engineering", "Decisioning"],
+    status: "in-progress",
+    caseStudy: {
+      problem:
+        "Most pass decisions are still judged qualitatively; analysts need repeatable quantitative recommendations.",
+      approach:
+        "Train a pass completion model, combine with xT gain, and rank all available pass options at each freeze-frame.",
+      architecture: [
+        { step: "Collect", detail: "Load event and freeze-frame contexts" },
+        { step: "Engineer", detail: "Build 25 features including pressure and angle" },
+        { step: "Model", detail: "Train and calibrate ensemble probability model" },
+        { step: "Score", detail: "Compute expected value as probability * xT gain" },
+        { step: "Rank", detail: "Return optimal and suboptimal options" },
+        { step: "Visualize", detail: "Render Voronoi ownership and pass trajectories" },
+      ],
+      results: [
+        { label: "AUC-ROC", value: "0.83", note: "Pass completion discrimination" },
+        { label: "Brier", value: "0.18", note: "Calibration quality" },
+        { label: "Inference", value: "2ms", note: "Real-time recommendation" },
+        { label: "Training Data", value: "300K+", note: "Action samples" },
+      ],
+      lessons: [
+        "Tracking data would materially improve dynamic decision quality.",
+        "Simple visual explanations improved trust for non-technical analysts.",
+        "Calibrated probabilities matter more than raw model confidence for decision systems.",
+      ],
+    },
+  },
+  {
+    slug: "scouting-engine",
+    title: "Scouting Engine",
+    tagline: "Automated hidden-talent matching pipeline",
+    track: "football-lab",
+    domains: ["data-pipeline", "ml-systems"],
+    artifactMode: "demo-only",
+    description: {
+      explain:
+        "A weekly ETL + ranking system that ingests player statistics, normalizes profiles, and identifies affordable alternatives to expensive transfer targets.",
+      builder:
+        "Selenium/Playwright scraping, PostgreSQL normalization, z-score harmonization by position, KNN cosine similarity, and Telegram delivery for scouting teams.",
+    },
+    modelCard: {
+      task: "Player Similarity Search + Alerting",
+      data: "fbref + Transfermarkt scraped weekly",
+      model: "KNN cosine similarity (k=10)",
+      keyMetric: "Similarity threshold >= 0.85",
+      latency: "~12 minutes full weekly ETL",
+      failureModes: [
+        "Source HTML changes break selectors",
+        "League and age bias in per-90 stats",
+        "No tactical role context in tabular features",
+      ],
+    },
+    tags: ["ETL", "PostgreSQL", "KNN", "Automation", "Scouting"],
+    status: "in-progress",
+    caseStudy: {
+      problem:
+        "Affordable scouting needs structured, recurring discovery workflows beyond manual video review.",
+      approach:
+        "Automate data collection, normalization, similarity indexing, and push delivery to scouts via a mobile-friendly channel.",
+      architecture: [
+        { step: "Scrape", detail: "Collect weekly stats from multiple football sources" },
+        { step: "Normalize", detail: "Standardize entities and per-90 metrics in PostgreSQL" },
+        { step: "Index", detail: "Compute z-score feature vectors by position" },
+        { step: "Match", detail: "Run cosine KNN against target profile" },
+        { step: "Filter", detail: "Apply age, league, and budget constraints" },
+        { step: "Deliver", detail: "Send radar and shortlist alerts via Telegram" },
+      ],
+      results: [
+        { label: "Coverage", value: "4200+", note: "Players across 8 leagues" },
+        { label: "Dimensions", value: "28", note: "Per-90 feature space" },
+        { label: "Pipeline", value: "12 min", note: "Weekly full run" },
+        { label: "Alert quality", value: ">=0.85", note: "Similarity threshold" },
+      ],
+      lessons: [
+        "Resilient selector fallback is mandatory for scraping reliability.",
+        "Human review loops remain necessary for tactical fit validation.",
+        "Push-based delivery increased adoption more than dashboard-based pull workflows.",
+      ],
+    },
+  },
+  {
+    slug: "mindlyr-decision-engine",
+    title: "Mindlyr Decision Engine",
+    tagline: "Multi-tenant logic engine for automation agencies",
+    track: "applied-ai",
+    domains: ["ml-systems", "data-pipeline"],
+    artifactMode: "demo-only",
+    description: {
+      explain:
+        "A centralized decision engine that decouples business logic from workflow tooling, enabling reliable rule execution across tenants.",
+      builder:
+        "NestJS and Prisma backend, JsonLogic evaluation runtime, AJV schema validation, immutable QA snapshots, and a TypeScript SDK for external integrations.",
+    },
+    modelCard: {
+      task: "Deterministic Rule Evaluation + QA Gating",
+      data: "Tenant configuration + validated payload contracts",
+      model: "JsonLogic runtime + JSON Schema (AJV)",
+      keyMetric: "100% critical-path pass rate after gating",
+      latency: "p95 < 40ms decision evaluation",
+      failureModes: [
+        "Contract drift between SDK and backend",
+        "Rule complexity growth without modularity",
+        "Snapshot mismatch during rapid version iteration",
+      ],
+    },
+    tags: ["NestJS", "Prisma", "PostgreSQL", "TypeScript", "Reliability"],
+    status: "live",
+    caseStudy: {
+      problem:
+        "Automation agencies were coupling logic into brittle workflows, causing maintenance overhead and low portability.",
+      approach:
+        "Centralize decision execution in a multi-tenant backend with strict schema validation and immutable QA checkpoints.",
+      architecture: [
+        { step: "Model", detail: "Define tenant-safe entities and policy boundaries" },
+        { step: "Validate", detail: "Enforce JSON contracts with AJV schemas" },
+        { step: "Evaluate", detail: "Execute JsonLogic decisions in deterministic runtime" },
+        { step: "Snapshot", detail: "Persist immutable versioned snapshots for QA" },
+        { step: "Trace", detail: "Capture timing and branch traces for observability" },
+        { step: "Integrate", detail: "Expose API + TypeScript SDK for partner tooling" },
+      ],
+      results: [
+        { label: "Reliability", value: "100%", note: "Critical-path gates passing" },
+        { label: "Latency p95", value: "<40ms", note: "Decision endpoint" },
+        { label: "Tenancy", value: "Multi-tenant", note: "Isolation by design" },
+        { label: "SDK adoption", value: "3rd-party ready", note: "Integration acceleration" },
+      ],
+      lessons: [
+        "Developer ergonomics in the SDK drove adoption more than internal docs.",
+        "Immutable snapshots reduced regression debugging time significantly.",
+        "Validation first prevented entire classes of production incidents.",
+      ],
+    },
+  },
+  {
+    slug: "aac-voice-cloning",
+    title: "AAC Voice Cloning",
+    tagline: "Hardware-aware TTS for assistive communication",
+    track: "applied-ai",
+    domains: ["genai", "vision", "ml-systems"],
+    artifactMode: "demo-only",
+    description: {
+      explain:
+        "Applied GenAI project focused on voice cloning for AAC devices, balancing quality, latency, and memory for constrained hardware environments.",
+      builder:
+        "Python-based audio pipeline with VAD and diarization preprocessing, optimized TTS fine-tuning via LoRA/QLoRA, quantized inference, and FastAPI deployment for production-like usage.",
+    },
+    modelCard: {
+      task: "Voice Cloning + Inference Optimization",
+      data: "Curated raw audio corpus with metadata and segmentation",
+      model: "Optimized TTS stack with LoRA/QLoRA adaptations",
+      keyMetric: "MOS proxy + latency-memory Pareto selection",
+      latency: "Real-time capable on constrained CPU/GPU profiles",
+      failureModes: [
+        "Speaker leakage in noisy source audio",
+        "Prosody instability in very short segments",
+        "Quality drop under aggressive quantization",
+      ],
+    },
+    tags: ["Generative AI", "TTS", "LoRA", "FastAPI", "Audio ML"],
+    status: "research",
+    caseStudy: {
+      problem:
+        "AAC users need personalized voices, but many deployment environments are resource-constrained and cannot host large models.",
+      approach:
+        "Build a full audio-to-inference pipeline with careful preprocessing and hardware-aware optimization for practical deployment.",
+      architecture: [
+        { step: "Ingest", detail: "Collect raw audio and generate metadata catalog" },
+        { step: "Preprocess", detail: "Apply VAD, diarization, and segment curation" },
+        { step: "Adapt", detail: "Fine-tune TTS with LoRA/QLoRA strategies" },
+        { step: "Optimize", detail: "Quantize and benchmark across target devices" },
+        { step: "Serve", detail: "Expose inference API with FastAPI" },
+        { step: "Evaluate", detail: "Track quality-latency-memory trade-offs" },
+      ],
+      results: [
+        { label: "Deployment", value: "Hardware-aware", note: "CPU/GPU constrained profiles" },
+        { label: "Pipeline", value: "End-to-end", note: "Audio ingestion to API output" },
+        { label: "Optimization", value: "LoRA/QLoRA", note: "Resource-efficient tuning" },
+        { label: "Domain", value: "AAC", note: "Assistive communication focus" },
+      ],
+      lessons: [
+        "Audio data quality is the dominant factor for perceived output quality.",
+        "Quantization must be tuned per hardware target, not globally.",
+        "Clinical-domain feedback loops are essential for practical reliability.",
+      ],
+    },
+  },
 ];
